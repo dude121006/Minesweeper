@@ -4,7 +4,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// used for error checking
+#define GLCall(x) GLClearErrors();\
+    x;\
+    GLLogCall(#x, __FILE__, __LINE__)
  
+
+
+// turn clear all the error flags
+static void GLClearErrors()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static void GLLogCall(const char* funcName, const char* fileName, int lineNum)
+{
+    GLenum error;
+    while (error = glGetError())
+    {
+        printf("[GLError]: %d %s  %s : %d\n", error, funcName, fileName, lineNum);
+    }
+}
+
 
 struct ShaderProgramSource
 {
@@ -152,6 +174,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
  
     GLFWwindow* window = glfwCreateWindow(800, 600, "this is NOT a window!", NULL, NULL);
     
@@ -162,6 +185,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
  
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         printf("Failed to initialize GLAD\n");
@@ -171,14 +195,17 @@ int main()
 
     float vertPos[] = {
         0.5f, 0.0f,   // right 0
-        0.0f, 0.5f,   // top 1
-        -0.5f, 0.0f,  // left 2
-        0.0f, -0.5f,  // bottom 3
+        0.25f, 0.3f,   // right top 1
+        0.0f, 0.0f,  // mid 2
+        -0.25f, 0.3f,   // left top 3
+        -0.5f, 0.0f,   // left 4
+        0.0f, -0.8f,  // bottom 5
     };
     
     unsigned int indices[] = {
         0, 1, 2,
-        0, 2, 3
+        2, 3, 4,
+        0, 4, 5
     };
     
 
@@ -197,7 +224,7 @@ int main()
 
     // give the buffer (the bound buffer) data, takes in the size(in bytes), 
     // pointer to the data (here vertPos array is already a pointer) and the method to draw
-    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), &vertPos, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), &vertPos, GL_STATIC_DRAW);
     
     // defines the layout of vertex attribute
     // index - location of attrib
@@ -214,7 +241,7 @@ int main()
     unsigned int ibo;
     glGenBuffers(1, &ibo); 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2 * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 
     // FREE: free the components of shaderProgramSource struct
@@ -223,25 +250,33 @@ int main()
     unsigned int shaderProgram = CreateShader(shaderSource.vertexShader, shaderSource.fragShader);
     glUseProgram(shaderProgram);
 
-    // GLenum err;
-    // while ((err = glGetError()) != GL_NO_ERROR) {
-    //     printf("OpenGL error: %d\n", err);
-    // }
+    // uniforms
+    int uniformLocation = glGetUniformLocation(shaderProgram, "u_color");
+    glUniform4f(uniformLocation, 1.0f, 0.5f, 0.5f, 1.0f);
+    
+//*--------------------------------------------------------------------------------------------- 
 
-    const GLubyte* version = glGetString(GL_VERSION);
-    if (version) {
-        printf("OpenGL Version: %s\n", version);
-    } else {
-        printf("Failed to retrieve OpenGL version\n");
-    }
- 
+    float red = 0.00f;
+    float increment = 0.03f;
+
+//*--------------------------------------------------------------------------------------------- 
+
+
     while (!glfwWindowShouldClose(window)) 
     {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
+
+        // color test
+        glUniform4f(uniformLocation, red, 0.2f, 0.4f, 1.0f);
+        red += increment;
+        if (red >= 1.0f) increment = -increment;
+        else if (red <= 0.0f) increment = -increment;
+
+
         // draw the buffer on screen
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL); 
+        GLCall(glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, NULL));
 
         //swap front and back buffers
         glfwSwapBuffers(window);
