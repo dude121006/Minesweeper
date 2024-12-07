@@ -5,27 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-// used for error checking
-#define GLCall(x) GLClearErrors();\
-    x;\
-    GLLogCall(#x, __FILE__, __LINE__)
- 
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "VertexArray.h"
 
 
-// turn clear all the error flags
-static void GLClearErrors()
-{
-    while (glGetError() != GL_NO_ERROR);
-}
+// TODO: Free layout (MEM LEAK!)
+// TODO: Cleanup all buffers
 
-static void GLLogCall(const char* funcName, const char* fileName, int lineNum)
-{
-    GLenum error;
-    while (error = glGetError())
-    {
-        printf("[GLError]: %d %s  %s : %d\n", error, funcName, fileName, lineNum);
-    }
-}
 
 
 struct ShaderProgramSource
@@ -33,7 +21,6 @@ struct ShaderProgramSource
     char* vertexShader;
     char* fragShader;
 };
-
 
 static struct ShaderProgramSource ParseFile(const char* vertexShaderPath, const char* fragShaderPath)
 {
@@ -100,6 +87,7 @@ static struct ShaderProgramSource ParseFile(const char* vertexShaderPath, const 
         }
         strcat(fragShader, buffer);
     }             
+
     fclose(vertexShaderFile);
     fclose(fragShaderFile);
     
@@ -174,7 +162,6 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
  
     GLFWwindow* window = glfwCreateWindow(800, 600, "this is NOT a window!", NULL, NULL);
     
@@ -194,12 +181,12 @@ int main()
     
 
     float vertPos[] = {
-        0.5f, 0.0f,   // right 0
-        0.25f, 0.3f,   // right top 1
-        0.0f, 0.0f,  // mid 2
+          0.5f, 0.0f,   // right 0
+         0.25f, 0.3f,   // right top 1
+          0.0f, 0.0f,   // mid 2
         -0.25f, 0.3f,   // left top 3
-        -0.5f, 0.0f,   // left 4
-        0.0f, -0.8f,  // bottom 5
+         -0.5f, 0.0f,   // left 4
+          0.0f, -0.8f   // bottom 5
     };
     
     unsigned int indices[] = {
@@ -208,40 +195,16 @@ int main()
         0, 4, 5
     };
     
+    VertexArray va = CreateVertexArray();
+    VertexBuffer vb = CreateVertexBuffer(&vertPos, 6 * 2 * sizeof(float));
 
-    // creating an vertex array
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    VertexBufferLayout layout = CreateLayout(); 
+    layout.Pushf(&layout, 2);
     
+    va.AddBuffer(&va, &vb, &layout);
 
-    // creates 1 buffer and gives it a tag of "buffer"
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
+    IndexBuffer ib = CreateIndexBuffer(indices, 3 * 3);
     
-    // binds the buffer and gives it a type of array buffer
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-
-    // give the buffer (the bound buffer) data, takes in the size(in bytes), 
-    // pointer to the data (here vertPos array is already a pointer) and the method to draw
-    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), &vertPos, GL_STATIC_DRAW);
-    
-    // defines the layout of vertex attribute
-    // index - location of attrib
-    // size - number of component, 2 here (coords) NOT SIZE AS IN BYTES
-    // stride - no. of bytes between two vertices 
-    // pointer - Offset (in bytes) to the first attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
-    
-    // enable vertex attributes
-    glEnableVertexAttribArray(0);
-    
-
-    // creating an index buffer
-    unsigned int ibo;
-    glGenBuffers(1, &ibo); 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 
     // FREE: free the components of shaderProgramSource struct
@@ -255,12 +218,11 @@ int main()
     glUniform4f(uniformLocation, 1.0f, 0.5f, 0.5f, 1.0f);
     
 //*--------------------------------------------------------------------------------------------- 
-
+    
     float red = 0.00f;
     float increment = 0.03f;
 
 //*--------------------------------------------------------------------------------------------- 
-
 
     while (!glfwWindowShouldClose(window)) 
     {
@@ -286,6 +248,7 @@ int main()
     }
     
     glDeleteProgram(shaderProgram); 
+
  
     glfwTerminate();
     return 0;
