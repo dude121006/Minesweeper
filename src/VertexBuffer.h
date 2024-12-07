@@ -10,9 +10,9 @@ typedef struct VertexBuffer
 {
     unsigned int m_ID;
     
-    void (*BindBuffer)(VertexBuffer* vb);
-    void (*UnbindBuffer)();
-    void (*DeleteBuffer)(VertexBuffer* vb);
+    void (*Bind)(VertexBuffer* vb);
+    void (*Unbind)();
+    void (*Delete)(VertexBuffer* vb);
     
 } VertexBuffer;
 

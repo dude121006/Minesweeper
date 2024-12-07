@@ -11,9 +11,9 @@ VertexBuffer CreateVertexBuffer(const void* data, unsigned int size)
     VertexBuffer vb;
 
     vb.m_ID = id; 
-    vb.BindBuffer = BindVertexBuffer;
-    vb.UnbindBuffer = UnbindVertexBuffer;
-    vb.DeleteBuffer = DeleteVertexBuffer;
+    vb.Bind = BindVertexBuffer;
+    vb.Unbind = UnbindVertexBuffer;
+    vb.Delete = DeleteVertexBuffer;
 
     return vb; 
 }

@@ -15,8 +15,8 @@ VertexArray CreateVertexArray()
     va.m_ID = id;
 
     va.AddBuffer = AddBuffer;
-    va.BindVertexArray = BindVertexArray;
-    va.UnbindVertexArray = UnbindVertexArray;
+    va.Bind = BindVertexArray;
+    va.Unbind = UnbindVertexArray;
 
     return va;
 }
@@ -38,10 +38,10 @@ void UnbindVertexArray()
 
 void AddBuffer(VertexArray* va, VertexBuffer* vb, VertexBufferLayout* layout)
 {
-    va->BindVertexArray(va);
+    va->Bind(va);
 
     //bind the vertex buffer
-    vb->BindBuffer(vb);
+    vb->Bind(vb);
     
     //define they layout of the buffer
     const VertexBufferElements* elements = layout->GetElements(layout);

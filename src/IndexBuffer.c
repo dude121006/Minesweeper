@@ -13,9 +13,9 @@ IndexBuffer CreateIndexBuffer(const void* data, unsigned int count)
     ib.m_ID = id; 
     ib.m_count = count; 
 
-    ib.BindBuffer = BindIndexBuffer;
-    ib.UnbindBuffer = UnbindIndexBuffer;
-    ib.DeleteBuffer = DeleteIndexBuffer;
+    ib.Bind = BindIndexBuffer;
+    ib.Unbind = UnbindIndexBuffer;
+    ib.Delete = DeleteIndexBuffer;
 
     return ib; 
 }

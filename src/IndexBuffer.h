@@ -10,9 +10,9 @@ typedef struct IndexBuffer
     unsigned int m_ID;
     unsigned int m_count;
     
-    void (*BindBuffer)(IndexBuffer* ib);
-    void (*UnbindBuffer)();
-    void (*DeleteBuffer)(IndexBuffer* ib);
+    void (*Bind)(IndexBuffer* ib);
+    void (*Unbind)();
+    void (*Delete)(IndexBuffer* ib);
     
 } IndexBuffer;
 

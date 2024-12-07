@@ -14,8 +14,8 @@ typedef struct VertexArray
     
     VertexArray (*CreateVertexArray)();
     void (*AddBuffer)(VertexArray* va, VertexBuffer* vb, VertexBufferLayout* layout);
-    void (*BindVertexArray)(VertexArray* va);
-    void (*UnbindVertexArray)();
+    void (*Bind)(VertexArray* va);
+    void (*Unbind)();
     
 
 } VertexArray;
