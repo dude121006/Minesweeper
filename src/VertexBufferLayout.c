@@ -1,6 +1,7 @@
 #include "VertexBufferLayout.h"
 
 
+
 VertexBufferLayout CreateLayout()
 {
     VertexBufferLayout layout;

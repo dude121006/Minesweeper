@@ -17,6 +17,7 @@ Shader CreateShader(const char* vertexShaderPath, const char* fragShaderPath)
 
     shader.GetUniformLocation = GetUniformLocation;
     shader.SetUniform4f = SetUniform4f;
+    shader.SetUniform1i = SetUniform1i;
 
     return shader;
 }
@@ -53,6 +54,11 @@ static void SetUniform4f(Shader* shader, const char* name, float v0, float v1, f
     GLCall(glUniform4f(GetUniformLocation(shader, name), v0, v1, v2, v3));
 }
 
+static void SetUniform1i(Shader* shader, const char* name, int value)
+{
+    GLCall(glUniform1i(GetUniformLocation(shader, name), value));
+}
+
 static unsigned int CreateShaderFromSource(char* vertShaderSource, char* fragShaderSource)
 {
     GLCall(unsigned int program = glCreateProgram());
@@ -78,7 +84,7 @@ static unsigned int CreateShaderFromSource(char* vertShaderSource, char* fragSha
     
     free(vertShaderSource);
     free(fragShaderSource);
-    
+   
     return program;
 }
 
@@ -96,7 +102,10 @@ static ShaderSource ParseShader(const char* vertexShaderPath, const char* fragSh
         return (ShaderSource){NULL, NULL};
     }
     
+    // temp buffer to store a single line
     char buffer[256];
+
+    // initial allocation
     char *vertexShader = (char*)malloc(1);
     char *fragShader = (char*)malloc(1);
     vertexShader[0] = '\0';
@@ -115,8 +124,8 @@ static ShaderSource ParseShader(const char* vertexShaderPath, const char* fragSh
 
     while (fgets(buffer, sizeof(buffer), vertexShaderFile))
     {
-        size_t shaderLen = strlen(vertexShader);
-        size_t bufferLen = strlen(buffer);
+        unsigned int shaderLen = strlen(vertexShader);
+        unsigned int bufferLen = strlen(buffer);
         
         // allocate new memory for vertexShader on the heap
         vertexShader = (char*)realloc(vertexShader, shaderLen + bufferLen + 1);

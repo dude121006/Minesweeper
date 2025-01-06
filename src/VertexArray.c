@@ -10,13 +10,15 @@ VertexArray CreateVertexArray()
     unsigned int id;
     GLCall(glGenVertexArrays(1, &id));
     GLCall(glBindVertexArray(id));
-    
+   
     VertexArray va;
     va.m_ID = id;
 
     va.AddBuffer = AddBuffer;
     va.Bind = BindVertexArray;
     va.Unbind = UnbindVertexArray;
+
+    GLCall(glBindVertexArray(0));
 
     return va;
 }
@@ -28,7 +30,7 @@ void BindVertexArray(VertexArray* va)
         printf("Vertex array is NULL!\n");
         return;
     }
-        GLCall(glBindVertexArray(va->m_ID));
+    GLCall(glBindVertexArray(va->m_ID));
 }
 
 void UnbindVertexArray()
@@ -36,6 +38,7 @@ void UnbindVertexArray()
     GLCall(glBindVertexArray(0));
 }
 
+// adds the vertex buffer along with the layout to the vertex array
 void AddBuffer(VertexArray* va, VertexBuffer* vb, VertexBufferLayout* layout)
 {
     va->Bind(va);

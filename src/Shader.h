@@ -27,6 +27,7 @@ typedef struct Shader
 
     int (*GetUniformLocation)(Shader* shader, const char* name);
     void (*SetUniform4f)(Shader* shader, const char* name, float v0, float v1, float v2, float v3);
+    void (*SetUniform1i)(Shader* shader, const char* name, int value);
 
     // ShaderSource (*ParseShader)(const char* vertexShaderPath, const char* fragShaderPath);
     // unsigned int (*CompileShader)(unsigned int type, char* source);
@@ -43,6 +44,7 @@ void DeleteShaderProgram(Shader* shader);
 // void SetUniform4f()
 static int GetUniformLocation(Shader* shader, const char* name);
 static void SetUniform4f(Shader* shader, const char* name, float v0, float v1, float v2, float v3);
+static void SetUniform1i(Shader* shader, const char* name, int value);
 
 static ShaderSource ParseShader(const char* vertexShaderPath, const char* fragShaderPath);
 static unsigned int CompileShader(unsigned int type, char* source);

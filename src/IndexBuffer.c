@@ -16,6 +16,8 @@ IndexBuffer CreateIndexBuffer(const void* data, unsigned int count)
     ib.Bind = BindIndexBuffer;
     ib.Unbind = UnbindIndexBuffer;
     ib.Delete = DeleteIndexBuffer;
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     return ib; 
 }
