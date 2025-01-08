@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
- 
+// #include "cglm/ivec2.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,6 +45,9 @@ int main()
         return -1;
     }
     
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    GLCall(glEnable(GL_BLEND));
+
 
     float vertices[] = {
           0.5f, 0.0f,  // right 0
@@ -114,7 +118,7 @@ int main()
     Renderer renderer = CreateRenderer();
     
     // texture stuff
-    Texture tex = CreateTexture("res/doge.png");
+    Texture tex = CreateTexture("res/doge_transparent.png");
     tex.Bind(&tex, 0);
 
     
@@ -137,6 +141,7 @@ int main()
 
         // doge rendering
         shaderTexture.Bind(&shaderTexture);
+        // shaderTexture.SetUniform4f(&shaderTexture, "u_color", red, 0.2f, 0.4f, 1.0f);
         renderer.Draw(&vaTexture, &ibTexture, &shaderTexture);
         shaderTexture.Unbind();
 
@@ -154,6 +159,7 @@ int main()
 
     // tex.Delete(&tex);
     shader.DeleteShaderProgram(&shader);
+    shader.DeleteShaderProgram(&shaderTexture);
 
     glfwTerminate();
     return 0;

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "texture.h": "c",
+        "glm.hpp": "c"
+    },
+    "C_Cpp.default.compilerPath": "C:\\MinGW\\bin\\g++.exe"
+}
